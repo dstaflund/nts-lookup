@@ -1,0 +1,10 @@
+{
+  "name": "sample-cloud-storage",
+  "version": "0.0.1",
+  "dependencies": {
+    "@google-cloud/common": "^2.2.3",
+    "@google-cloud/firestore": "^2.5.0",
+    "@google-cloud/storage": "^4.0.0",
+    "fast-crc32c": "^2.0.0"
+  }
+}

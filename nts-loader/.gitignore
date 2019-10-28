@@ -1,0 +1,6 @@
+**/.idea
+**/.gradle
+**/build
+**/venv
+**/node_modules
+**/function.zip
