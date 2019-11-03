@@ -57,4 +57,4 @@ writeMapsToFirestore = (contents) => {
     console.log('Done.  A total of ' + ntsMaps.length + ' maps were written to Firestore');
 };
 
-//this.loadMaps();
+this.loadMaps({}, {});

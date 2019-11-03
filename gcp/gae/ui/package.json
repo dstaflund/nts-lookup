@@ -1,0 +1,27 @@
+{
+  "name": "nts-lookup-search",
+  "description": "Javascript search API of the NTS Lookup web application",
+  "version": "0.0.1",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "Darryl Staflund",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dstaflund/nts-lookup.git"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "test": "mocha --exit test/*.test.js"
+  },
+  "dependencies": {
+    "express": "^4.16.3",
+    "gulp": "^4.0.2"
+  },
+  "devDependencies": {
+    "mocha": "^6.1.4",
+    "supertest": "^4.0.2"
+  }
+}

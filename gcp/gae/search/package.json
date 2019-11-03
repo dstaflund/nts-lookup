@@ -1,0 +1,29 @@
+{
+  "name": "nts-lookup-ui",
+  "description": "Javascript frontend of the NTS Lookup web application",
+  "version": "0.0.1",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "Darryl Staflund",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dstaflund/nts-lookup.git"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "test": "mocha --exit test/*.test.js"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^2.5.0",
+    "crypto": "^1.0.1",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "supertest": "^4.0.2"
+  }
+}
