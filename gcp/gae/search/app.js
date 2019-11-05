@@ -1,43 +1,47 @@
 'use strict';
 
+if (process.env.NODE_ENV === 'production') {
+    require('@google-cloud/debug-agent').start({ allowExpressions: true });
+}
+
 const { Firestore } = require('@google-cloud/firestore');
+const { PubSub } = require('@google-cloud/pubsub');
 
 const express = require('express')();
-const crypto = require('crypto');
 const firestore = new Firestore();
+const pubsub = new PubSub();
+const crypto = require('crypto');
 
+const HASH_ALGORITHM = 'sha256';
+const HASH_ENCODING = 'hex';
+const HASH_LENGTH = 7;
 const DEFAULT_LIMIT = 256;
 
 
 /****************************************************************
  *
- * Logging methods
+ * Pub/sub topic methods
  *
  ****************************************************************/
-const createLogEntry = (req, searchType) => {
-    return {
+const publishSearchRequest = (req, res, next) => {
+    const searchType = getSearchType(req)
+    const searchRequest = {
         timestamp: new Date().toJSON(),
         userIp: crypto
-            .createHash('sha256')
+            .createHash(HASH_ALGORITHM)
             .update(req.ip)
-            .digest('hex')
-            .substr(0, 7),
+            .digest(HASH_ENCODING)
+            .substr(0, HASH_LENGTH),
         searchType: searchType,
         searchParameters: JSON.stringify(req.params)
-    }
-};
+    };
 
-const insertLogEntry = async(accessRecord) => {
-    return firestore
-        .collection('searches')
-        .doc()
-        .create({ data: accessRecord });
-};
-
-const logAccessAttempt = async(req, res, next) => {
-    const searchType = getSearchType(req);
-    const visit = await createLogEntry(req, searchType);
-    await insertLogEntry(visit);
+    const jsonRequest = JSON.stringify(searchRequest);
+    const messageData = Buffer.from(jsonRequest);
+    pubsub
+        .topic('search-request-topic')
+        .publish(messageData)
+        .then(messageId => console.log('Message ' + messageId + ' published'));
 };
 
 const getSearchType = req => {
@@ -54,8 +58,8 @@ const getSearchType = req => {
  * API methods
  *
  ****************************************************************/
-express.get('/name/:name', logAccessAttempt, async(req, res, next) => {
-    await logAccessAttempt(req, 'name');
+express.get('/name/:name', async(req, res, next) => {
+    publishSearchRequest(req, res, next);
     firestore
         .collection('maps')
         .where('name', '==', req.params.name)
@@ -72,8 +76,8 @@ express.get('/name/:name', logAccessAttempt, async(req, res, next) => {
         .catch(error => next(error));
 });
 
-express.get('/title/:title', logAccessAttempt, async(req, res, next) => {
-    await logAccessAttempt(req, 'title');
+express.get('/title/:title', async(req, res, next) => {
+    publishSearchRequest(req, res, next);
     firestore
         .collection('maps')
         .where('title', '==', req.params.title)
@@ -90,8 +94,8 @@ express.get('/title/:title', logAccessAttempt, async(req, res, next) => {
         .catch(error => next(error));
 });
 
-express.get('/parent/:parent', logAccessAttempt, async(req, res, next) => {
-    await logAccessAttempt(req, 'parent');
+express.get('/parent/:parent', async(req, res, next) => {
+    publishSearchRequest(req, res, next);
     firestore
         .collection('maps')
         .where('parent', '==', req.params.parent)
@@ -108,8 +112,9 @@ express.get('/parent/:parent', logAccessAttempt, async(req, res, next) => {
         .catch(error => next(error));
 });
 
-express.get('/bounds/:north/:south/:east/:west', logAccessAttempt, async(req, res, next) => {
-    await logAccessAttempt(req, 'bounds');
+// TODO:  Firestore doesn't support multiple non-equality WHERE searches.  Replace with geohashes?
+express.get('/bounds/:north/:south/:east/:west', async(req, res, next) => {
+    publishSearchRequest(req, res, next);
     firestore
         .collection('maps')
         .where('north', '<=', req.params.north)
@@ -132,7 +137,7 @@ express.get('/bounds/:north/:south/:east/:west', logAccessAttempt, async(req, re
 
 /****************************************************************
  *
- * Bootstream code
+ * Bootstrap code
  *
  ****************************************************************/
 const PORT = process.env.PORT || 8080;

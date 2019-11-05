@@ -17,7 +17,9 @@
     "test": "mocha --exit test/*.test.js"
   },
   "dependencies": {
+    "@google-cloud/debug-agent": "^4.0.4",
     "@google-cloud/firestore": "^2.5.0",
+    "@google-cloud/pubsub": "^1.1.5",
     "crypto": "^1.0.1",
     "express": "^4.17.1"
   },
