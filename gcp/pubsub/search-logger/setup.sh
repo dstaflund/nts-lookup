@@ -1,0 +1,1 @@
+gcloud --quite pubsub topics create search-request-topic

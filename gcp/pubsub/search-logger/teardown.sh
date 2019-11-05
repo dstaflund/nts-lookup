@@ -1,0 +1,1 @@
+gcloud --quite pubsub topics delete search-request-topic
