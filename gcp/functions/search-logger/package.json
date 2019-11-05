@@ -1,0 +1,9 @@
+{
+  "name": "search-logger-function",
+  "version": "0.0.1",
+  "dependencies": {
+    "@google-cloud/common": "^2.2.3",
+    "@google-cloud/firestore": "^2.5.0",
+    "crypto": "^1.0.1"
+  }
+}

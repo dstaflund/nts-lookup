@@ -1,0 +1,1 @@
+gcloud --quiet functions delete search-logger
