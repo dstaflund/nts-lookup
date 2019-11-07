@@ -52,6 +52,11 @@ const getSearchType = req => {
     return 'error';
 };
 
+const addHeaders = (res, maps) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Type', 'application/json');
+};
+
 
 /****************************************************************
  *
@@ -60,6 +65,7 @@ const getSearchType = req => {
  ****************************************************************/
 express.get('/name/:name', async(req, res, next) => {
     publishSearchRequest(req, res, next);
+    addHeaders(res);
     firestore
         .collection('maps')
         .where('name', '==', req.params.name)
@@ -78,6 +84,7 @@ express.get('/name/:name', async(req, res, next) => {
 
 express.get('/title/:title', async(req, res, next) => {
     publishSearchRequest(req, res, next);
+    addHeaders(res);
     firestore
         .collection('maps')
         .where('title', '==', req.params.title)
@@ -96,6 +103,7 @@ express.get('/title/:title', async(req, res, next) => {
 
 express.get('/parent/:parent', async(req, res, next) => {
     publishSearchRequest(req, res, next);
+    addHeaders(res);
     firestore
         .collection('maps')
         .where('parent', '==', req.params.parent)
@@ -114,6 +122,7 @@ express.get('/parent/:parent', async(req, res, next) => {
 
 express.get('/type/:mapType', async(req, res, next) => {
     publishSearchRequest(req, res, next);
+    addHeaders(res);
     firestore
         .collection('maps')
         .where('map_type', '==', req.params.mapType)
@@ -133,6 +142,7 @@ express.get('/type/:mapType', async(req, res, next) => {
 // TODO:  Firestore doesn't support multiple non-equality WHERE searches.  Replace with geohashes?
 express.get('/bounds/:north/:south/:east/:west', async(req, res, next) => {
     publishSearchRequest(req, res, next);
+    addHeaders(res);
     firestore
         .collection('maps')
         .where('north', '<=', req.params.north)
