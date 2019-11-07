@@ -15,7 +15,7 @@ const crypto = require('crypto');
 const HASH_ALGORITHM = 'sha256';
 const HASH_ENCODING = 'hex';
 const HASH_LENGTH = 7;
-const DEFAULT_LIMIT = 256;
+const DEFAULT_LIMIT = 1000;
 
 
 /****************************************************************
@@ -99,6 +99,24 @@ express.get('/parent/:parent', async(req, res, next) => {
     firestore
         .collection('maps')
         .where('parent', '==', req.params.parent)
+        .limit(DEFAULT_LIMIT)
+        .get()
+        .then(snapshot => snapshot.docs.map(doc => doc.data()))
+        .then(maps => {
+            res
+                .status(200)
+                .set('Content-Type', 'text/json')
+                .send(JSON.stringify(maps))
+                .end();
+        })
+        .catch(error => next(error));
+});
+
+express.get('/type/:mapType', async(req, res, next) => {
+    publishSearchRequest(req, res, next);
+    firestore
+        .collection('maps')
+        .where('map_type', '==', req.params.mapType)
         .limit(DEFAULT_LIMIT)
         .get()
         .then(snapshot => snapshot.docs.map(doc => doc.data()))
