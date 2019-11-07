@@ -12,7 +12,7 @@ from firebase_admin import firestore
 class FirestorePush:
     def __init__(self):
         # Login with your Firestore credentials
-        cred = credentials.Certificate('/home/dstaflund/security/gcp/nts-lookup/nts-lookup-c3fe3f8fa9c2.json')
+        cred = credentials.Certificate('/home/dstaflund/security/gcp/nts-lookup/nts-lookup-257217-b5508fea7e97.json')
         self.db_admin = firebase_admin.initialize_app(cred)
         self.db = firestore.client()
 
@@ -32,6 +32,14 @@ class FirestorePush:
         # Start a batch
         batch = self.db.batch()
         for nts_map in self.maps_db:
+
+            # Derive map type
+            if len(nts_map['name']) == 3:
+                nts_map['map_type'] = 'series'
+            elif len(nts_map['name']) == 4:
+                nts_map['map_type'] = 'area'
+            else:
+                nts_map['map_type'] = 'sheet'
 
             # Commit the batch at every 500th record.
             if idx % 500 == 0:
