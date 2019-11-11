@@ -1,0 +1,36 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    height: 75px;
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    height: calc(100% - 150px - 26px);     /* Google Maps control seems to take up an extra 26 pixels -- not sure why */
+    margin: 0;
+    padding: 0;
+}
+
+.map-section {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#map {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+footer {
+    height: 75px;
+    margin: 0;
+    padding: 0;
+}

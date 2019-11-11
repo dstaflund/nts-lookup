@@ -1,6 +1,13 @@
 **/.idea
 **/.gradle
+**/bin
 **/build
-**/venv
-**/node_modules
 **/function.zip
+**/include
+**/lib
+**/lib64
+**/node_modules
+**/share
+**/venv
+get-pip.py
+pyvenv.cfg

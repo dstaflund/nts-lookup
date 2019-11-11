@@ -13,6 +13,5 @@
     "theme_color":"#ffffff",
     "background_color":"#ffffff",
     "scope": "/",
-    "display":"standalone",
-    "theme_color": "#ffffff"
+    "display":"standalone"
 }
