@@ -1,3 +1,4 @@
+import pygeohash as pgh
 import json
 from google.cloud import firestore
 import firebase_admin
@@ -41,6 +42,14 @@ class FirestorePush:
             else:
                 nts_map['map_type'] = 'sheet'
 
+            # Derive centre coordinates
+            centerLat = (nts_map['north'] + nts_map['south']) / 2
+            centerLng = (nts_map['east'] + nts_map['west']) / 2
+            nts_map['center'] = firestore.GeoPoint(centerLat, centerLng)
+
+            # Derive geohash
+            nts_map['geohash'] = pgh.encode(centerLat, centerLng)
+
             # Commit the batch at every 500th record.
             if idx % 500 == 0:
                 if idx > 0:
@@ -50,10 +59,12 @@ class FirestorePush:
                 # Start a new batch for the next iteration.
                 batch = self.db.batch()
             idx += 1
-            print(str(idx) + str('/') + str(total) + ': ' + str(nts_map['name']))
+            print(str(idx) + str('/') + str(total) + ': ' + str(nts_map['name']) + ' (Geohash = ' + nts_map['geohash'] + ')')
             record_ref = maps_collection.document(nts_map['name'])
+
             # Include current record in batch
             batch.set(record_ref, nts_map)
+
         # Include current record in batch
         if idx % 500 != 0:
             print('Committing..')
