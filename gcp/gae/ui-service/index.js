@@ -5,6 +5,8 @@ const SEARCH_SERVICE_URL = 'https://search-dot-nts-lookup-257217.appspot.com';
 
 NTSOverlay.prototype = new google.maps.OverlayView();
 
+let map;
+
 // noinspection JSUnusedGlobalSymbols
 /**
  * Called when map control is first rendered.
@@ -12,7 +14,7 @@ NTSOverlay.prototype = new google.maps.OverlayView();
  * At this point we need to display Canada in the viewport and wire up various handlers, etc.
  */
 function initMap () {
-    const map = new google.maps.Map(document.getElementById('map'), {
+    map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: CANADA_LAT_CENTER, lng: CANADA_LNG_CENTER },
         zoom: (getViewportSize()[0] <= 1000 ? 3 : 4)
     });
@@ -28,6 +30,19 @@ const boundsChanged = (map) => {
     fetch(SEARCH_SERVICE_URL + '/type/series')
         .then(response => response.json())
         .then(ntsMaps => ntsMaps.forEach(ntsMap => drawMapBoundary(ntsMap, map)))
+        .then(() => map.removeListener('bounds_changed'))
+        .catch(error => console.log(error));
+};
+
+/**
+ * Called when a map is clicked.
+ *
+ * @param map
+ */
+const mapClicked = (ntsMap) => {
+    fetch(SEARCH_SERVICE_URL + '/parent/' + ntsMap.name)
+        .then(response => response.json())
+        .then(childMaps => childMaps.forEach(childMap => drawMapBoundary(childMap, map)))
         .catch(error => console.log(error));
 };
 
@@ -76,10 +91,22 @@ NTSOverlay.prototype.onAdd = function(){
     div.style.padding = '0';
     div.style.textAlign = 'center';
     div.textContent = this._ntsMap.name;
+//    div.setAttribute('map-data', JSON.stringify(this._ntsMap));
+    div.addEventListener('mouseover', (e) => {
+        div.style.borderColor = '#00F';
+        div.style.borderWidth = '4px';
+    });
+    div.addEventListener('mouseout', (e) => {
+        div.style.borderColor = '#F00';
+        div.style.borderWidth = '1px';
+    });
+    div.addEventListener('click', () => {
+        mapClicked(this._ntsMap);
+    });
     this._div = div;
 
     // Add div to Google Map's 'overlayLayer' pane
-    this.getPanes().overlayLayer.appendChild(div);
+    this.getPanes().overlayMouseTarget.appendChild(div);
 };
 
 NTSOverlay.prototype.draw = function(){
