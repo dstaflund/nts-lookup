@@ -154,12 +154,14 @@ express.get('/bounds/:north/:south/:east/:west', async(req, res, next) => {
         .limit(DEFAULT_LIMIT)
         .get()
         .then(snapshot => snapshot.docs.map(doc => doc.data()))
-        .then(maps => maps
-            .filter(map => map.north <= req.params.north
-                        && map.south >= req.params.south
-                        && map.east <= req.params.east
-                        && map.west >= req.params.west)
-        )
+
+        // Do some post-search filtering to dispose of unwanted search results
+        .then(maps => maps.filter(
+                map => map.north <= req.params.north
+                    && map.south >= req.params.south
+                    && map.east <= req.params.east
+                    && map.west >= req.params.west
+         ))
         .then(maps => {
             res
                 .status(200)
