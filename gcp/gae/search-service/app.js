@@ -147,9 +147,6 @@ express.get('/bounds/:north/:south/:east/:west', async(req, res, next) => {
     const swCornerHash = geohash.encode(req.params.south, req.params.west);
     const neCornerHash = geohash.encode(req.params.north, req.params.east);
 
-    console.log(swCornerHash);
-    console.log(neCornerHash);
-
     firestore
         .collection('maps')
         .where('geohash', '>=', swCornerHash)
@@ -157,6 +154,12 @@ express.get('/bounds/:north/:south/:east/:west', async(req, res, next) => {
         .limit(DEFAULT_LIMIT)
         .get()
         .then(snapshot => snapshot.docs.map(doc => doc.data()))
+        .then(maps => maps
+            .filter(map => map.north <= req.params.north
+                        && map.south >= req.params.south
+                        && map.east <= req.params.east
+                        && map.west >= req.params.west)
+        )
         .then(maps => {
             res
                 .status(200)
