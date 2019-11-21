@@ -11,6 +11,7 @@ const express = require('express')();
 const firestore = new Firestore();
 const pubsub = new PubSub();
 const crypto = require('crypto');
+const geohash = require('ngeohash');
 
 const HASH_ALGORITHM = 'sha256';
 const HASH_ENCODING = 'hex';
@@ -139,16 +140,20 @@ express.get('/type/:mapType', async(req, res, next) => {
         .catch(error => next(error));
 });
 
-// TODO:  Firestore doesn't support multiple non-equality WHERE searches.  Replace with geohashes?
 express.get('/bounds/:north/:south/:east/:west', async(req, res, next) => {
     publishSearchRequest(req, res, next);
     addHeaders(res);
+
+    const swCornerHash = geohash.encode(req.params.south, req.params.west);
+    const neCornerHash = geohash.encode(req.params.north, req.params.east);
+
+    console.log(swCornerHash);
+    console.log(neCornerHash);
+
     firestore
         .collection('maps')
-        .where('north', '<=', req.params.north)
-        .where('south', '>=', req.params.south)
-        .where('east', '<=', req.params.east)
-        .where('west', '>=', req.params.west)
+        .where('geohash', '>=', swCornerHash)
+        .where('geohash', '<=', neCornerHash)
         .limit(DEFAULT_LIMIT)
         .get()
         .then(snapshot => snapshot.docs.map(doc => doc.data()))
